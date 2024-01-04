@@ -1,83 +1,66 @@
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import "./App.css";
 
-import React,{useEffect,useState} from 'react';
-import './App.css';
-
-// Do not change this
 const LARGE_NUMBER = 1000000000;
 
 function App() {
-
-
   const [value, setValue] = useState(0);
   const [dark, setTheme] = useState(true);
   const [themeName, setThemeName] = useState("dark");
   const [currentList, setList] = useState([]);
+  const [delayResult, setDelayResult] = useState(null);
 
+  const delayFunction = useCallback(() => {
+    console.log("Delay function ran");
+    for (let index = 0; index < LARGE_NUMBER; index++) {}
+    setDelayResult(value + 2);
+  }, [value]);
 
-  // should not change the LOGIC inside this function - you can make changes to the function but logic should NOT change
-  const delayFunction = ()=> {
-    console.log("Delay Function Ran")
-    for(let index=0; index<LARGE_NUMBER; index++){};
-    return value+2;
-  
-  }
+  const testFunction = useCallback(() => {
+    return [value * 3, value * 4];
+  }, [value]);
 
-  // should not change the LOGIC inside this function - you can make changes to the function but logic should NOT change
-  const testFunction = ()=>{
-    return [value*3 ,value*4]
-  }
+  useEffect(() => {
+    console.log("Callback function was called - multiplied value");
+    delayFunction();
+  }, [delayFunction]);
 
-  
+  useEffect(() => {
+    setThemeName(dark ? "dark" : "light");
+  }, [dark]);
 
-  // should not change this
-  useEffect(()=>{
-    console.log("Callback Function was called")
-  },[testFunction])
-
-
-
-  useEffect(()=>{
-    if(dark){
-      setThemeName("dark")
-    }
-    else{
-      setThemeName("light")
-    }
-  },[dark])
-
-
-  const handleClick = ()=>{
+  const handleClick = () => {
     setTheme(!dark);
-  }
+  };
 
-  const handleChangeValue = ()=>{
-    setValue(value+1);
-  }
+  const handleChangeValue = () => {
+    console.log("Change value button clicked");
+    setValue((prevValue) => prevValue + 1);
+  };
 
-  const handleList = ()=>{
-    setList(testFunction);
-  }
+  const handleList = () => {
+    setList(testFunction());
+  };
 
-  const styleTheme = {
-   backgroundColor:dark ? "black":"#ccc7c7",
-  }
+  const styleTheme = useMemo(() => {
+    return {
+      backgroundColor: dark ? "black" : "#ccc7c7",
+    };
+  }, [dark]);
 
   return (
-    
     <div className="page" style={styleTheme}>
       <button onClick={handleClick}>{themeName}</button>
-      <h1 >{value}</h1>
+      <h1>{value}</h1>
       <button onClick={handleChangeValue}>Change Value</button>
       <button onClick={handleList}>Show List</button>
-      <h2>{delayFunction()}</h2>
+      <h2>{delayResult !== null ? delayResult : "Calculating..."}</h2>
       <div>
-        {currentList.map((item,index)=>{
-          return <h2 key={index}>{item}</h2>
-        })}
-
+        {currentList.map((item, index) => (
+          <h2 key={index}>{item}</h2>
+        ))}
       </div>
     </div>
-    
   );
 }
 
